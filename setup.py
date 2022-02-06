@@ -1,0 +1,50 @@
+import io
+import os
+import re
+
+from setuptools import find_packages, setup
+
+def read(*filenames, **kwargs):
+    encoding = kwargs.get('encoding', 'utf-8')
+    sep = kwargs.get('sep', os.linesep)
+    buf = []
+    for filename in filenames:
+        with io.open(filename, encoding=encoding) as f:
+            buf.append(f.read())
+    return sep.join(buf)
+
+setup(
+    name='prov',
+    version='0.0.1',
+    license='Apache Software License',
+    url='http://github.com/kjenney/prov',
+    author='Ken Jenney',
+    author_email='me@kenjenney.com',
+    description='Administer AWS',
+    long_description=read('README.rst'),
+    packages=find_packages(),
+    python_requires='>=3',
+    install_requires=[
+        'python-dotenv',
+        'Click',
+        'pulumi>=3.0.0,<4.0.0',
+        'pulumi_aws>=3.38.0',
+    ],
+    entry_points = {
+        'console_scripts': ['prov = prov.cli:entry'],
+    },
+    classifiers=[
+        'Development Status :: 3 - Alpha',
+        'Environment :: Console',
+        'Environment :: Other Environment',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Information Technology',
+        'License :: OSI Approved :: Apache Software License',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Topic :: Internet',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: Utilities',
+    ]
+)
