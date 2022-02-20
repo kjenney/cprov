@@ -20,9 +20,11 @@ KMS_KEY=
 ## Usage
 
     prov - show help 
-    prov up - create the s3 bucket
-    prov down - destroy the s3 bucket
-    prov preview - preview the changes
 
+## Steps
+
+1) Create VPC
+2) Stand up EKS cluster
+3) Create application
 
 

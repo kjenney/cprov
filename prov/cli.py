@@ -2,9 +2,7 @@ import click
 
 from prov.version import VERSION
 
-from prov.commands.up import up
-from prov.commands.down import down
-from prov.commands.preview import preview
+from prov.commands.do import do
 
 @click.group()
 def entry():
@@ -15,7 +13,5 @@ def version():
     """Show the version"""
     print('version: ' + VERSION)
 
-entry.add_command(up)
-entry.add_command(down)
-entry.add_command(preview)
+entry.add_command(do)
 entry.add_command(version)
