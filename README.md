@@ -26,5 +26,6 @@ KMS_KEY=
 1) Create VPC
 2) Stand up EKS cluster
 3) Create application
+4) Create DNS record for application
 
 
