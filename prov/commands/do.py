@@ -32,6 +32,12 @@ def eks(ctx):
 
 @do.command()
 @click.pass_context
+def app(ctx):
+    """Do some stuff with everything"""
+    manage('eks-app', ctx.obj['ENVIRONMENT'], ctx.obj['ACTION'], pulumi_eks_app)
+
+@do.command()
+@click.pass_context
 def everything(ctx):
     """Do some stuff with everything"""
     manage('eks-cluster', ctx.obj['ENVIRONMENT'], ctx.obj['ACTION'], pulumi_eks)
