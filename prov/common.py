@@ -3,14 +3,15 @@ import sys
 import json
 from turtle import back
 import pulumi
-from pulumi import export, ResourceOptions, CustomTimeouts
+from pulumi import ResourceOptions, CustomTimeouts
 from pulumi_kubernetes import Provider
 from pulumi_kubernetes.apps.v1 import Deployment, DeploymentSpecArgs
 from pulumi_kubernetes.core.v1 import ContainerArgs, PodSpecArgs, PodTemplateSpecArgs, Service, ServicePortArgs, ServiceSpecArgs
 from pulumi_kubernetes.meta.v1 import LabelSelectorArgs, ObjectMetaArgs
 from pulumi import automation as auto
-from pulumi_aws import eks, iam, ec2, get_availability_zones
+from pulumi_aws import eks, iam, ec2, get_availability_zones, route53, elb
 from dotenv import dotenv_values
+from prov.utils import generate_kube_config, AutoTag
 import click
 
 
@@ -42,7 +43,7 @@ def check_for_config():
         click.echo(click.style("Make sure your .env file is in the same directory as this script", fg='red'))
         sys.exit(1)
 
-def manage(project_name, environment, action, pulumi_program):
+def manage(project_name, environment, action, pulumi_program, addtl_configs=None):
     """Pulumi up"""
     if check_for_aws_credentials() is False:
         print("You need to set your AWS credentials before running this command")
@@ -95,6 +96,10 @@ def manage(project_name, environment, action, pulumi_program):
     stack.set_config("environment", auto.ConfigValue(value=environment))
     stack.set_config("project_name", auto.ConfigValue(value=project_name))
     #stack.set_config("aws:defaultTags", auto.ConfigValue(value={"Environment": environment, "Managed By": "Pulumi"}))
+
+    if addtl_configs is not None:
+        for k, v in addtl_configs.items():
+            stack.set_config(k, auto.ConfigValue(value=v))
     print("config set")
 
     print("refreshing stack...")
@@ -187,43 +192,6 @@ def pulumi_secrets():
             "Name": "provtest",
         }
     )
-
-def generate_kube_config(eks_cluster):
-    """Generate kube config"""
-    kubeconfig = pulumi.Output.all(eks_cluster.endpoint, eks_cluster.certificate_authority.apply(lambda v: v.data), eks_cluster.name).apply(lambda args: json.dumps({
-        "apiVersion": "v1",
-        "clusters": [{
-            "cluster": {
-                "server": args[0],
-                "certificate-authority-data": args[1]
-            },
-            "name": "kubernetes",
-        }],
-        "contexts": [{
-            "context": {
-                "cluster": "kubernetes",
-                "user": "aws",
-            },
-            "name": "aws",
-        }],
-        "current-context": "aws",
-        "kind": "Config",
-        "users": [{
-            "name": "aws",
-            "user": {
-                "exec": {
-                    "apiVersion": "client.authentication.k8s.io/v1alpha1",
-                    "command": "aws-iam-authenticator",
-                    "args": [
-                        "token",
-                        "-i",
-                        args[2],
-                    ],
-                },
-            },
-        }],
-    }))
-    return kubeconfig
 
 def pulumi_eks():
     """Provision an EKS cluster"""
@@ -433,7 +401,7 @@ def pulumi_eks_app():
     # Deploy app
     app_labels = { "app": "app-nginx", "project_name": project_name, "environment": environment }
     app = Deployment(
-        "do-app-dep",
+        "eks-app",
         spec=DeploymentSpecArgs(
             selector=LabelSelectorArgs(match_labels=app_labels),
             replicas=1,
@@ -442,3 +410,35 @@ def pulumi_eks_app():
                 spec=PodSpecArgs(containers=[ContainerArgs(name='nginx', image='nginx')]),
             ),
         ), opts=ResourceOptions(provider=k8s_provider))
+    ingress = Service(
+        'eks-app-svc',
+        spec=ServiceSpecArgs(
+            type='LoadBalancer',
+            selector=app_labels,
+            ports=[ServicePortArgs(port=80)],
+        ), opts=ResourceOptions(provider=k8s_provider, custom_timeouts=CustomTimeouts(create="15m", delete="15m")))
+
+    ingress_hostname = ingress.status.apply(lambda s: s.load_balancer.ingress[0].hostname)
+    pulumi.export('ingress_hostname', ingress_hostname)
+
+def pulumi_eks_app_route_53():
+    """Create a Route53 Record for the app"""
+    config = pulumi.Config()
+    environment = config.require('environment')
+    project_name = config.require('project_name')
+    hosted_zone_name = config.require('hosted_zone_name')
+    # Get Load Balancer IP
+    eks_app_reference = pulumi.StackReference(f"eks-app-{environment}")
+    ingress_hostname = eks_app_reference.get_output("ingress_hostname")
+    # Create Route53 Record
+    elb_hosted_zone = elb.get_hosted_zone_id()
+    selected = route53.get_zone(name=f"{hosted_zone_name}.")
+    eksapp = route53.Record("eks-app-record",
+        zone_id=selected.id,
+        name=f"eks-app.{selected.name}",
+        type="A",
+        aliases=[route53.RecordAliasArgs(
+            name=ingress_hostname,
+            zone_id=elb_hosted_zone.id,
+            evaluate_target_health=False,
+        )])
