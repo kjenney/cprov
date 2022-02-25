@@ -1,6 +1,6 @@
 # prov
 
-A CLI tool for provisoning cloud resoruces with Pulumi Automation
+A CLI tool for provisoning and managing cloud resoruces with Pulumi Automation
 
 ## Installation
 

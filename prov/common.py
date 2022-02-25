@@ -43,6 +43,43 @@ def check_for_config():
         click.echo(click.style("Make sure your .env file is in the same directory as this script", fg='red'))
         sys.exit(1)
 
+def status(project_name, environment):
+    """Get a Pulumi Stack Status"""
+    if check_for_aws_credentials() is False:
+        print("You need to set your AWS credentials before running this command")
+        sys.exit(1)
+    config = check_for_config()
+    backend_bucket = config['STATE_BUCKET']
+    aws_region = os.getenv('AWS_REGION')
+    kms_alias_name = config['KMS_KEY']
+    stack_name = f"{project_name}-{environment}"
+    secrets_provider = f"awskms://alias/{kms_alias_name}"
+    backend_url = f"s3://{backend_bucket}"
+    if action == 'destroy':
+        print(f"Destroying infra: {project_name}")
+    elif action == 'preview':
+        print(f"Previewing infra: {project_name}")
+    else:
+        print(f"Deploying infra: {project_name}")
+
+    project_settings=auto.ProjectSettings(
+        name=project_name,
+        runtime="python",
+        backend={"url": backend_url}
+    )
+
+    stack_settings=auto.StackSettings(
+        secrets_provider=secrets_provider)
+
+    workspace_opts = auto.LocalWorkspaceOptions(project_settings=project_settings,
+                                                  secrets_provider=secrets_provider,
+                                                  stack_settings={stack_name: stack_settings})
+
+    stack = auto.create_or_select_stack(stack_name=stack_name,
+                                        project_name=project_name,
+                                        program=pulumi_program,
+                                        opts=workspace_opts)
+
 def manage(project_name, environment, action, pulumi_program, addtl_configs=None):
     """Pulumi up"""
     if check_for_aws_credentials() is False:
