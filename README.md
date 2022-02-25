@@ -1,4 +1,4 @@
-# prov
+# cprov
 
 A CLI tool for provisoning and managing cloud resoruces with Pulumi Automation
 
@@ -19,7 +19,7 @@ KMS_KEY=
 
 ## Usage
 
-    prov - show help 
+    cprov - show help 
 
 ## Steps
 

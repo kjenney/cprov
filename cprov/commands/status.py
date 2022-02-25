@@ -1,7 +1,7 @@
 import click
 import functools
 
-from prov.common import manage
+from cprov.common import manage
 
 @click.command()
 def status():

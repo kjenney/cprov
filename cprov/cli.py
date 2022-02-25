@@ -1,9 +1,9 @@
 import click
 
-from prov.version import VERSION
+from cprov.version import VERSION
 
-from prov.commands.do import do
-from prov.commands.status import status
+from cprov.commands.do import do
+from cprov.commands.status import status
 
 @click.group()
 def entry():

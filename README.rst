@@ -1,4 +1,4 @@
-prov
+cprov
 ==============
 
     Author: Ken Jenney
@@ -10,14 +10,14 @@ Installation Instructions
 
 .. code:: bash
 
-    $ pip install prov
+    $ pip install cprov
 
 Executing
 ---------
 
-Once installed run ``prov`` CLI with ``--help`` option:
+Once installed run ``cprov`` CLI with ``--help`` option:
 
 .. code:: bash
 
-    $ prov --help
+    $ cprov --help
 

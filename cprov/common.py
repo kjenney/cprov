@@ -11,7 +11,7 @@ from pulumi_kubernetes.meta.v1 import LabelSelectorArgs, ObjectMetaArgs
 from pulumi import automation as auto
 from pulumi_aws import eks, iam, ec2, get_availability_zones, route53, elb
 from dotenv import dotenv_values
-from prov.utils import generate_kube_config, AutoTag
+from cprov.utils import generate_kube_config, AutoTag
 import click
 
 

@@ -14,10 +14,10 @@ def read(*filenames, **kwargs):
     return sep.join(buf)
 
 setup(
-    name='prov',
+    name='cprov',
     version='0.0.1',
     license='Apache Software License',
-    url='http://github.com/kjenney/prov',
+    url='http://github.com/kjenney/cprov',
     author='Ken Jenney',
     author_email='me@kenjenney.com',
     description='Administer AWS',
@@ -32,7 +32,7 @@ setup(
         'pulumi-kubernetes>=3.0.0,<4.0.0',
     ],
     entry_points = {
-        'console_scripts': ['prov = prov.cli:entry'],
+        'console_scripts': ['cprov = cprov.cli:entry'],
     },
     classifiers=[
         'Development Status :: 3 - Alpha',

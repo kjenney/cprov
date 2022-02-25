@@ -1,7 +1,7 @@
 import click
 import functools
 
-from prov.common import manage, pulumi_eks, pulumi_eks_app, pulumi_eks_app_route_53
+from cprov.common import manage, pulumi_eks, pulumi_eks_app, pulumi_eks_app_route_53
 
 @click.group(chain=True)
 @click.option('--action', type=click.Choice(['up', 'destroy', 'preview'], case_sensitive=False), default='up')
@@ -14,11 +14,11 @@ def do(ctx, action, environment):
 
     Deploy an EKS cluster to AWS:
 
-    prov do --action up --environment dev eks
+    cprov do --action up --environment dev eks
 
     Deploy an EKS cluster, an application, and a Route53 record for the application to AWS:
 
-    prov do --action up --environment dev everything
+    cprov do --action up --environment dev everything
     """
     ctx.ensure_object(dict)
     ctx.obj['ACTION'] = action
