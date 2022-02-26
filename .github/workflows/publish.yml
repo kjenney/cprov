@@ -13,6 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python 3.8.11
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8.11
     - name: install requirements
       run: |
         pip install -r requirements.txt
@@ -33,6 +37,7 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
     - name: upload package
-      run: |
-        twine check dist/*
-        twine upload dist/*
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
