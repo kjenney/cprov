@@ -1,5 +1,5 @@
 twine
 pytest
-twisted
 incremental
 Click
+wheel
