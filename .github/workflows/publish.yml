@@ -13,22 +13,26 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Install requirements
+    - name: install requirements
       run: |
         pip install -r requirements.txt
-    - name: Bump version
+    - name: setup git config
+      run: |
+        git config user.name "GitHub Actions Bot"
+        git config user.email "<>"
+    - name: bump version
       run: |
         python -m incremental.update cprov --patch
-    - name: Commit version change
+    - name: commit version bump
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         git commit -am "Bump version"
         git push
-    - name: Build package
+    - name: build package
       run: |
         python setup.py sdist bdist_wheel
-    - name: Upload to PyPI
+    - name: upload package
       run: |
         twine check dist/*
         twine upload dist/*
