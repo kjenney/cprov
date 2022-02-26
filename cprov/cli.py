@@ -1,6 +1,6 @@
 import click
 
-from cprov.version import VERSION
+from ._version import __version__
 
 from cprov.commands.do import do
 from cprov.commands.status import status
@@ -12,7 +12,7 @@ def entry():
 @entry.command()
 def version():
     """Show the version"""
-    print('version: ' + VERSION)
+    print(str(__version__))
 
 entry.add_command(do)
 entry.add_command(status)

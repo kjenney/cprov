@@ -24,7 +24,14 @@ setup(
     long_description=read('README.rst'),
     packages=find_packages(),
     python_requires='>=3',
+    use_incremental=True,
+    setup_requires=[
+        'incremental',
+        'twine',
+        'pytest',
+    ],
     install_requires=[
+        'incremental',
         'python-dotenv',
         'Click',
         'pulumi>=3.5.1,<4.0.0',

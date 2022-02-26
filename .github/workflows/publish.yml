@@ -1,0 +1,30 @@
+name: Package and Publish Python Module using Twine
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+
+    steps:
+    - name: Bump version
+      run: |
+        python -m incremental.update cprov --patch
+    - name: Commit version change
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git commit -am "Bump version"
+        git push
+    - name: Build package
+      run: |
+        python setup.py sdist bdist_wheel
+    - name: Upload to PyPI
+      run: |
+        twine check dist/*
+        twine upload dist/*

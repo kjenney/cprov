@@ -1,3 +1,5 @@
 .env
 build
 cprov.egg-info
+.eggs
+dist
