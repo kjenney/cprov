@@ -12,6 +12,7 @@ jobs:
       max-parallel: 1
 
     steps:
+    - uses: actions/checkout@v2
     - name: Install requirements
       run: |
         pip install -r requirements.txt
