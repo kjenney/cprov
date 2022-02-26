@@ -12,6 +12,9 @@ jobs:
       max-parallel: 1
 
     steps:
+    - name: Install requirements
+      run: |
+        pip install -r requirements.txt
     - name: Bump version
       run: |
         python -m incremental.update cprov --patch
