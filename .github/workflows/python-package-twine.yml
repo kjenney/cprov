@@ -24,5 +24,6 @@ jobs:
       run: |
         python setup.py sdist bdist_wheel
     - name: Upload to PyPI
+      run: |
         twine check dist/*
         twine upload dist/*
