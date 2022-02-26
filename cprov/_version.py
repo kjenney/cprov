@@ -7,5 +7,5 @@ Provides cprov version information.
 
 from incremental import Version
 
-__version__ = Version("cprov", 0, 0, 2)
+__version__ = Version('cprov', 0, 0, 3)
 __all__ = ["__version__"]
